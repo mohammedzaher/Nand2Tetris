@@ -9,11 +9,11 @@ using namespace std;
 map<string, int> symbolTable;
 map<string, string> mnemonicsTable;
 map<string, string> mnemonicsTable1;
-string inFile = "D:/Courses/Nand2Tetris_I/nand2tetris/projects/06/add/Add.asm";
-// string inFile = "D:/Courses/Nand2Tetris_I/nand2tetris/projects/06/max/Max.asm";
+// string inFile = "D:/Courses/Nand2Tetris_I/nand2tetris/projects/06/add/Add.asm";
+//  string inFile = "D:/Courses/Nand2Tetris_I/nand2tetris/projects/06/max/Max.asm";
 // string inFile = "D:/Courses/Nand2Tetris_I/nand2tetris/projects/06/max/MaxL.asm";
 // string inFile = "D:/Courses/Nand2Tetris_I/nand2tetris/projects/06/pong/Pong.asm";
-// string inFile = "D:/Courses/Nand2Tetris_I/nand2tetris/projects/06/pong/PongL.asm";
+string inFile = "D:/Courses/Nand2Tetris_I/nand2tetris/projects/06/pong/PongL.asm";
 // string inFile = "D:/Courses/Nand2Tetris_I/nand2tetris/projects/06/rect/Rect.asm";
 // string inFile = "D:/Courses/Nand2Tetris_I/nand2tetris/projects/06/rect/RectL.asm";
 string outFile = "RectL.hack";
@@ -347,4 +347,6 @@ int main()
     ignoreWhitespaces();
     handleSymbols();
     handleInstructions();
+    remove("temp.txt");
+    remove("temp1.txt");
 }
