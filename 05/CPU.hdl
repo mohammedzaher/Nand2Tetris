@@ -39,5 +39,35 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-    // Put your code here:
+    Mux16(a=instruction, b=ALUout, sel=instruction[15], out=Mux1out);
+    
+    Not(in=instruction[15], out=notin15);
+    Or(a=notin15, b=instruction[5], out=intoA); // with help
+    
+    ARegister(in=Mux1out, load=intoA, out=ARegisterout, out[0..14]=addressM); // controlled by d2
+    
+    Mux16(a=ARegisterout, b=inM, sel=instruction[12], out=MUX2out); // controlled by a
+    
+    And(a=instruction[4], b=instruction[15], out=intoD); // with help
+    DRegister(in=ALUout, load=intoD, out=DRegisterout); // controlled by d1
+    
+    ALU(x=DRegisterout, y=MUX2out, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8], f=instruction[7], no=instruction[6], out=ALUout, out=outM, zr=zero, ng=neg);  // controlled by c5c4c3c2c1c0
+    And(a=instruction[3], b=instruction[15], out=writeM, out=writeMout);    
+    
+    // Program Counter Logic
+    DMux8Way(in=true, sel=instruction[0..2], a=aa, b=bb, c=cc, d=dd, e=ee, f=ff, g=gg, h=hh);
+    Not(in=zero, out=notzero);
+    Not(in=neg, out=notneg);
+    And(a=notzero, b=notneg, out=a2);
+    And(a=a2, b=bb, out=load2);
+    And(a=cc, b=zero, out=load3);
+    And(a=dd, b=notneg, out=load4);
+    And(a=ee, b=neg, out=load5);
+    And(a=ff, b=notzero, out=load6);
+    Or(a=zero, b=neg, out=a3);
+    And(a=gg, b=a3, out=load7);
+    Or8Way(in[0]=false,in[1]=load2,in[2]=load3,in[3]=load4,in[4]=load5,in[5]=load6,in[6]=load7,in[7]=hh,out=loador8);
+    And(a=loador8, b=instruction[15], out=loadf);
+    
+    PC(in=ARegisterout, load=loadf, inc=true, reset=reset, out[0..14]=pc);
 }

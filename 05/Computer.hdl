@@ -19,5 +19,7 @@ CHIP Computer {
     IN reset;
 
     PARTS:
-    // Put your code here:
+    CPU(inM=Memoryout, instruction=outROM32K, reset=reset, outM=outMout, writeM=writeMout, addressM=addressMout, pc=pcout);
+    ROM32K(address=pcout, out=outROM32K);
+    Memory(in=outMout, load=writeMout, address=addressMout, out=Memoryout);   
 }

@@ -9,11 +9,6 @@
 // This program only needs to handle arguments that satisfy
 // R0 >= 0, R1 >= 0, and R0*R1 < 32768.
 
-// Pseudo code
-// x = R0, y = R1, result = 0;
-// for(i = 0; i < n; i++) {
-//    result = result + x;
-//}
 // Computing the Mult of two numbers
     @i  // i=1
     M=1
@@ -35,10 +30,9 @@
     @LOOP // goto LOOP
     0;JMP
 (END)
-@result
-D=M
-@R2
-M=D
-@END
-0;JMP
-
+    @result
+    D=M
+    @R2
+    M=D
+    @END
+    0;JMP
