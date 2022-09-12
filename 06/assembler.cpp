@@ -9,14 +9,14 @@ using namespace std;
 map<string, int> symbolTable;
 map<string, string> mnemonicsTable;
 map<string, string> mnemonicsTable1;
-// string inFile = "D:/Courses/Nand2Tetris_I/nand2tetris/projects/06/add/Add.asm";
-//  string inFile = "D:/Courses/Nand2Tetris_I/nand2tetris/projects/06/max/Max.asm";
-// string inFile = "D:/Courses/Nand2Tetris_I/nand2tetris/projects/06/max/MaxL.asm";
-// string inFile = "D:/Courses/Nand2Tetris_I/nand2tetris/projects/06/pong/Pong.asm";
-string inFile = "D:/Courses/Nand2Tetris_I/nand2tetris/projects/06/pong/PongL.asm";
-// string inFile = "D:/Courses/Nand2Tetris_I/nand2tetris/projects/06/rect/Rect.asm";
-// string inFile = "D:/Courses/Nand2Tetris_I/nand2tetris/projects/06/rect/RectL.asm";
-string outFile = "RectL.hack";
+// string inFile = "D:/Courses/Nand2Tetris/nand2tetris/projects/06/add/Add.asm";
+//  string inFile = "D:/Courses/Nand2Tetris/nand2tetris/projects/06/max/Max.asm";
+//  string inFile = "D:/Courses/Nand2Tetris/nand2tetris/projects/06/max/MaxL.asm";
+//  string inFile = "D:/Courses/Nand2Tetris/nand2tetris/projects/06/pong/Pong.asm";
+//  string inFile = "D:/Courses/Nand2Tetris/nand2tetris/projects/06/pong/PongL.asm";
+//  string inFile = "D:/Courses/Nand2Tetris/nand2tetris/projects/06/rect/Rect.asm";
+//  string inFile = "D:/Courses/Nand2Tetris/nand2tetris/projects/06/rect/RectL.asm";
+// string outFile = "Add.hack";
 
 bool isNumber(const string &str)
 {
@@ -28,12 +28,12 @@ bool isNumber(const string &str)
     return true;
 }
 
-void ignoreWhitespaces()
+void ignoreWhitespaces(string inputfile)
 {
     ifstream iFile;
     ofstream oFile;
     string line;
-    string inputfile = inFile;      // The Input of the Assembler
+    // string inputfile = inFile;      // The Input of the Assembler
     string outputfile = "temp.txt"; // The input of handleSymbols
 
     // Open input file
@@ -185,17 +185,15 @@ void initializingMnemonicsTable()
     mnemonicsTable["JMP"] = "111";
 }
 
-void handleInstructions()
+void handleInstructions(string outputfile)
 {
     ifstream iFile;
     ofstream oFile;
     string line, temp;
     string inputfile = "temp1.txt"; // The output of handleSymbols
-    string outputfile = outFile;    // The output of the Assembler
-    bitset<16> bsetA;
     int variables = 16;
-
-    // Open input file
+    // string outputfile = outFile;    // The output of the Assembler
+    //  string outputfile = outFile;    // The output of the Assembler
     iFile.open(inputfile);
     if (!iFile.is_open())
     {
@@ -340,13 +338,26 @@ void handleSymbols()
     }
 }
 
-int main()
+int main(int argc, char *argv[])
 {
+    if (argc != 2)
+    {
+        cout << "input: assembler.exe <file name>:" << endl;
+        return 0;
+    }
+    cout << "argc =" << ' ' << argc << endl;
+    // cout << argv[1] << endl;
+    string outputfile = argv[1];
+    size_t found = outputfile.find_last_of("/\\");
+    outputfile = outputfile.substr(found + 1);
+    size_t found2 = outputfile.find_last_of(".");
+    outputfile = outputfile.substr(0, found2) + ".hack";
+    // cout << found << ' ' << found2 << ' ' << outputfile << endl;
     initializingSymbolTable();
     initializingMnemonicsTable();
-    ignoreWhitespaces();
+    ignoreWhitespaces(argv[1]);
     handleSymbols();
-    handleInstructions();
+    handleInstructions(outputfile);
     remove("temp.txt");
     remove("temp1.txt");
 }
