@@ -1,0 +1,14 @@
+# Nand to Tetris
+- [x] Project 01
+- [x] Project 02
+- [x] Project 03
+- [x] Project 04
+- [x] Project 05
+- [x] Project 06
+- [x] Project 07
+- [ ] Project 08 Currently Working
+- [ ] Project 09
+- [ ] Project 10
+- [ ] Project 11
+- [ ] Project 12
+- [ ] Project 13
