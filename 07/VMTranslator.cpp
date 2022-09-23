@@ -153,56 +153,39 @@ public:
     {
         if (command == "add")
         {
-            oFile << "@SP\nA=M\nA=A-1\nD=M\nA=A-1\nM=D+M\n@SP\nM=M-1\n";
+            writeArthAddSub("D+M");
         }
         else if (command == "sub")
         {
-            oFile << "@SP\nA=M\nA=A-1\nD=M\nA=A-1\nM=M-D\n@SP\nM=M-1\n";
+            writeArthAddSub("M-D");
         }
         else if (command == "neg")
         {
-            oFile << "@SP\nA=M\nA=A-1\nM=-M\n";
+            writeArthNegNot("-M");
         }
         else if (command == "eq")
         {
-            oFile << "@SP\nA=M\nA=A-1\nD=M\nA=A-1\nD=M-D\n@LABEL" << labelNum << "\nD;JEQ\n";
-            oFile << "@SP\nM=M-1\nA=M\nA=A-1\nM=0\n@LABEL" << labelNum + 1 << "\n0;JMP\n";
-            oFile << "(LABEL" << labelNum << ")" << endl;
-            oFile << "@SP\nM=M-1\nA=M\nA=A-1\nM=-1\n";
-            oFile << "(LABEL" << labelNum + 1 << ")" << endl;
-            labelNum += 2;
+            writeArthComp("JEQ");
         }
         else if (command == "gt")
         {
-            oFile << "@SP\nA=M\nA=A-1\nD=M\nA=A-1\nD=M-D\n@LABEL" << labelNum << "\nD;JGT\n";
-            oFile << "@SP\nM=M-1\nA=M\nA=A-1\nM=0\n@LABEL" << labelNum + 1 << "\n0;JMP\n";
-            oFile << "(LABEL" << labelNum << ")" << endl;
-            oFile << "@SP\nM=M-1\nA=M\nA=A-1\nM=-1\n";
-            oFile << "(LABEL" << labelNum + 1 << ")" << endl;
-            labelNum += 2;
+            writeArthComp("JGT");
         }
         else if (command == "lt")
         {
-            oFile << "@SP\nA=M\nA=A-1\nD=M\nA=A-1\nD=M-D\n@LABEL" << labelNum << "\nD;JLT\n";
-            oFile << "@SP\nM=M-1\nA=M\nA=A-1\nM=0\n@LABEL" << labelNum + 1 << "\n0;JMP\n";
-            oFile << "(LABEL" << labelNum << ")" << endl;
-            oFile << "@SP\nM=M-1\nA=M\nA=A-1\nM=-1\n";
-            oFile << "(LABEL" << labelNum + 1 << ")" << endl;
-            labelNum += 2;
+            writeArthComp("JLT");
         }
         else if (command == "and")
         {
-            oFile << "@SP\nA=M\nA=A-1\nD=M\nA=A-1\nM=M&D\n";
-            oFile << "@SP\nM=M-1\n";
+            writeArthAndOr("M&D");
         }
         else if (command == "or")
         {
-            oFile << "@SP\nA=M\nA=A-1\nD=M\nA=A-1\nM=M|D\n";
-            oFile << "@SP\nM=M-1\n";
+            writeArthAndOr("M|D");
         }
         else if (command == "not")
         {
-            oFile << "@SP\nA=M\nA=A-1\nM=!M\n";
+            writeArthNegNot("!M");
         }
     }
 
@@ -212,122 +195,119 @@ public:
         {
             if (command == C_PUSH)
             {
-                oFile << "@LCL\nD=M\n@" << index << "\nA=D+A\nD=M\n"; // addr = segmentPointer + i
-                oFile << "@SP\nA=M\nM=D\n";                           // *SP = *addr
-                oFile << "@SP\nM=M+1\n";                              // SP++
+                writePushSegments("LCL", index);
             }
             else if (command == C_POP)
             {
-                oFile << "@LCL\nD=M\n@" << index << "\nD=D+A\n@addr\nM=D\n"; // addr = segmentPointer + i
-                oFile << "@SP\nM=M-1\n";
-                oFile << "@SP\nA=M\nD=M\n@addr\nA=M\nM=D\n";
+                writePopSegments("LCL", index);
             }
         }
         else if (segment == "argument")
         {
             if (command == C_PUSH)
             {
-                oFile << "@ARG\nD=M\n@" << index << "\nA=D+A\nD=M\n"; // addr = segmentPointer + i
-                oFile << "@SP\nA=M\nM=D\n";                           // *SP = *addr
-                oFile << "@SP\nM=M+1\n";                              // SP++
+                writePushSegments("ARG", index);
             }
             else if (command == C_POP)
             {
-                oFile << "@ARG\nD=M\n@" << index << "\nD=D+A\n@addr\nM=D\n"; // addr = segmentPointer + i
-                oFile << "@SP\nM=M-1\n";
-                oFile << "@SP\nA=M\nD=M\n@addr\nA=M\nM=D\n";
+                writePopSegments("ARG", index);
             }
         }
         else if (segment == "this")
         {
             if (command == C_PUSH)
             {
-                oFile << "@THIS\nD=M\n@" << index << "\nA=D+A\nD=M\n"; // addr = segmentPointer + i
-                oFile << "@SP\nA=M\nM=D\n";                            // *SP = *addr
-                oFile << "@SP\nM=M+1\n";                               // SP++
+                writePushSegments("THIS", index);
             }
             else if (command == C_POP)
             {
-                oFile << "@THIS\nD=M\n@" << index << "\nD=D+A\n@addr\nM=D\n"; // addr = segmentPointer + i
-                oFile << "@SP\nM=M-1\n";
-                oFile << "@SP\nA=M\nD=M\n@addr\nA=M\nM=D\n";
+                writePopSegments("THIS", index);
             }
         }
         else if (segment == "that")
         {
             if (command == C_PUSH)
             {
-                oFile << "@THAT\nD=M\n@" << index << "\nA=D+A\nD=M\n"; // addr = segmentPointer + i
-                oFile << "@SP\nA=M\nM=D\n";                            // *SP = *addr
-                oFile << "@SP\nM=M+1\n";                               // SP++
+                writePushSegments("THAT", index);
             }
             else if (command == C_POP)
             {
-                oFile << "@THAT\nD=M\n@" << index << "\nD=D+A\n@addr\nM=D\n"; // addr = segmentPointer + i
-                oFile << "@SP\nM=M-1\n";                                      // SP--
-                oFile << "@SP\nA=M\nD=M\n@addr\nA=M\nM=D\n";                  // *addr = *SP
+                writePopSegments("THAT", index);
             }
         }
         else if (segment == "temp")
         {
             if (command == C_PUSH)
             {
-                oFile << "@5\nD=A\n@" << index << "\nA=D+A\nD=M\n"; // addr = segmentPointer + i
-                oFile << "@SP\nA=M\nM=D\n";                         // *SP = *addr
-                oFile << "@SP\nM=M+1\n";                            // SP++
+                writeAInstruction("5");
+                writeCInstruction("D", "A");
+                writeAInstruction(to_string(index));
+                writeCInstruction("A", "D+A");
+                writeCInstruction("D", "M");
+                writeAInstruction("SP");
+                writeCInstruction("A", "M");
+                writeCInstruction("M", "D");
+                writeAInstruction("SP");
+                writeCInstruction("M", "M+1");
             }
             else if (command == C_POP)
             {
-                oFile << "@5\nD=A\n@" << index << "\nD=D+A\n@addr\nM=D\n"; // addr = segmentPointer + i
-                oFile << "@SP\nM=M-1\n";
-                oFile << "@SP\nA=M\nD=M\n@addr\nA=M\nM=D\n";
+                writeAInstruction("5");
+                writeCInstruction("D", "A");
+                writeAInstruction(to_string(index));
+                writeCInstruction("D", "D+A");
+                writeAInstruction("addr");
+                writeCInstruction("M", "D");
+                writeAInstruction("SP");
+                writeCInstruction("M", "M-1");
+                writeAInstruction("SP");
+                writeCInstruction("A", "M");
+                writeCInstruction("D", "M");
+                writeAInstruction("addr");
+                writeCInstruction("A", "M");
+                writeCInstruction("M", "D");
             }
         }
         else if (segment == "constant")
         {
-            oFile << "@" << index << "\nD=A\n@SP\nA=M\nM=D\n"; // *SP = i
-            oFile << "@SP\nM=M+1\n";                           // SP++;
+            writeAInstruction(to_string(index));
+            writeCInstruction("D", "A");
+            writeAInstruction("SP");
+            writeCInstruction("A", "M");
+            writeCInstruction("M", "D");
+            writeAInstruction("SP");
+            writeCInstruction("M", "M+1");
         }
         else if (segment == "pointer")
         {
+            string str = "";
             if (index == 0)
             {
-                if (command == C_PUSH)
-                {
-                    oFile << "@THIS\nD=M\n@SP\nA=M\nM=D\n";
-                    oFile << "@SP\nM=M+1\n";
-                }
-                else
-                {
-                    oFile << "@SP\nM=M-1\nA=M\nD=M\n";
-                    oFile << "@THIS\nM=D\n";
-                }
+                str = "THIS";
             }
             else
             {
-                if (command == C_PUSH)
-                {
-                    oFile << "@THAT\nD=M\n@SP\nA=M\nM=D\n";
-                    oFile << "@SP\nM=M+1\n";
-                }
-                else
-                {
-                    oFile << "@SP\nM=M-1\nA=M\nD=M\n";
-                    oFile << "@THAT\nM=D\n";
-                }
+                str = "THAT";
+            }
+            if (command == C_PUSH)
+            {
+                writePushSegments2(str);
+            }
+            else
+            {
+                writePopSegments2(str);
             }
         }
         else if (segment == "static")
         {
+            string str = outputFile + "." + to_string(index);
             if (command == C_PUSH)
             {
-                oFile << "@" << outputFile << "." << index << "\nD=M\n@SP\nA=M\nM=D\n";
-                oFile << "@SP\nM=M+1\n";
+                writePushSegments2(str);
             }
             else
             {
-                oFile << "@SP\nM=M-1\nA=M\nD=M\n";
-                oFile << "@" << outputFile << "." << index << "\nM=D\n";
+                writePopSegments2(str);
             }
         }
     }
@@ -337,13 +317,134 @@ public:
         oFile.close();
     }
 
-    void a_Instruction(string str)
+    void writeAInstruction(string str)
     {
         oFile << "@" << str << endl;
     }
-    void a_Instruction(int i)
+    void writeCInstruction(string dest, string comp, string jmp = "")
     {
-        oFile << "@" << i << endl;
+        if (jmp.empty())
+        {
+            oFile << dest << "=" << comp << endl;
+        }
+        else if (dest.empty())
+        {
+            oFile << comp << ";" << jmp << endl;
+        }
+        else
+        {
+            oFile << dest << "=" << comp << ";" << jmp;
+        }
+    }
+    void writeLabel(string label)
+    {
+        oFile << "(" << label << ")" << endl;
+    }
+    void writePushSegments(string segment, int index)
+    {
+        writeAInstruction(segment);
+        writeCInstruction("D", "M");
+        writeAInstruction(to_string(index));
+        writeCInstruction("A", "D+A");
+        writeCInstruction("D", "M");
+        writeAInstruction("SP");
+        writeCInstruction("A", "M");
+        writeCInstruction("M", "D");
+        writeAInstruction("SP");
+        writeCInstruction("M", "M+1");
+    }
+    void writePopSegments(string segment, int index)
+    {
+        writeAInstruction(segment);
+        writeCInstruction("D", "M");
+        writeAInstruction(to_string(index));
+        writeCInstruction("D", "D+A");
+        writeAInstruction("addr");
+        writeCInstruction("M", "D");
+        writeAInstruction("SP");
+        writeCInstruction("M", "M-1");
+        writeAInstruction("SP");
+        writeCInstruction("A", "M");
+        writeCInstruction("D", "M");
+        writeAInstruction("addr");
+        writeCInstruction("A", "M");
+        writeCInstruction("M", "D");
+    }
+    void writePushSegments2(string segment)
+    {
+        writeAInstruction(segment);
+        writeCInstruction("D", "M");
+        writeAInstruction("SP");
+        writeCInstruction("A", "M");
+        writeCInstruction("M", "D");
+        writeAInstruction("SP");
+        writeCInstruction("M", "M+1");
+    }
+    void writePopSegments2(string segment)
+    {
+        writeAInstruction("SP");
+        writeCInstruction("M", "M-1");
+        writeCInstruction("A", "M");
+        writeCInstruction("D", "M");
+        writeAInstruction(segment);
+        writeCInstruction("M", "D");
+    }
+    void writeArthAndOr(string sign)
+    {
+        writeAInstruction("SP");
+        writeCInstruction("A", "M");
+        writeCInstruction("A", "A-1");
+        writeCInstruction("D", "M");
+        writeCInstruction("A", "A-1");
+        writeCInstruction("M", sign);
+        writeAInstruction("SP");
+        writeCInstruction("M", "M-1");
+    }
+    void writeArthAddSub(string sign)
+    {
+        writeAInstruction("SP");
+        writeCInstruction("A", "M");
+        writeCInstruction("A", "A-1");
+        writeCInstruction("D", "M");
+        writeCInstruction("A", "A-1");
+        writeCInstruction("M", sign);
+        writeAInstruction("SP");
+        writeCInstruction("M", "M-1");
+    }
+    void writeArthNegNot(string sign)
+    {
+        writeAInstruction("SP");
+        writeCInstruction("A", "M");
+        writeCInstruction("A", "A-1");
+        writeCInstruction("M", sign);
+    }
+    void writeArthComp(string jmp)
+    {
+        string label1 = "LABEL" + to_string(labelNum);
+        string label2 = "LABEL" + to_string(labelNum + 1);
+        writeAInstruction("SP");
+        writeCInstruction("A", "M");
+        writeCInstruction("A", "A-1");
+        writeCInstruction("D", "M");
+        writeCInstruction("A", "A-1");
+        writeCInstruction("D", "M-D");
+        writeAInstruction(label1);
+        writeCInstruction("", "D", jmp);
+        writeAInstruction("SP");
+        writeCInstruction("M", "M-1");
+        writeCInstruction("A", "M");
+        writeCInstruction("A", "A-1");
+        writeCInstruction("M", "0");
+        writeAInstruction(label2);
+        writeCInstruction("", "0", "JMP");
+        writeLabel(label1);
+        writeAInstruction("SP");
+        writeCInstruction("M", "M-1");
+        writeCInstruction("A", "M");
+        writeCInstruction("A", "A-1");
+        writeCInstruction("M", "-1");
+        writeLabel(label2);
+        labelNum += 2;
     }
 };
 
