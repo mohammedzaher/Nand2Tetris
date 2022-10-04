@@ -6,8 +6,8 @@
 - [x] Project 05
 - [x] Project 06
 - [x] Project 07
-- [ ] Project 08 Currently Working
-- [ ] Project 09
+- [x] Project 08 Done with very small error in the last test
+- [ ] Project 09 Currently Working
 - [ ] Project 10
 - [ ] Project 11
 - [ ] Project 12
